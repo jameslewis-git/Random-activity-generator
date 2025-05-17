@@ -549,41 +549,47 @@ export default function ActivityGenerator() {
 
                 <Dialog open={isFavoritesOpen} onOpenChange={setIsFavoritesOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="text-xs">
-                      <Heart className="h-3 w-3 mr-1" />
-                      Favorites
+                    <Button variant="outline" size="sm" className="text-xs bg-transparent hover:bg-indigo-900/30 border border-indigo-500/50 text-indigo-300 button-glow">
+                      <motion.span whileHover={{ scale: 1.05 }}>
+                        <Heart className="h-3 w-3 mr-1" />
+                        Favorites
+                      </motion.span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="bg-gradient-to-br from-gray-900 to-indigo-900 border border-indigo-500/30 backdrop-filter backdrop-blur-lg text-white">
                     <DialogHeader>
-                      <DialogTitle>Favorite Activities</DialogTitle>
+                      <DialogTitle className="text-indigo-300">Favorite Activities</DialogTitle>
                     </DialogHeader>
-                    <ScrollArea className="h-[300px] rounded-md border p-4">
+                    <ScrollArea className="h-[300px] rounded-md border border-indigo-500/30 bg-gray-900/50 p-4">
                       {favorites.length > 0 ? (
                         <div className="space-y-4">
                           {favorites.map((activity) => (
-                            <div
+                            <motion.div
                               key={`favorite-${activity.id}`}
-                              className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg"
+                              className="flex items-start gap-3 p-3 hover:bg-indigo-900/40 rounded-lg border border-indigo-500/20"
+                              whileHover={{ scale: 1.02, borderColor: "rgba(99, 102, 241, 0.4)" }}
+                              transition={{ duration: 0.2 }}
                             >
-                              <div className="p-2 bg-gray-100 rounded-full">{activity.emoji}</div>
+                              <div className="p-2 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg">{activity.emoji}</div>
                               <div className="flex-1">
-                                <h4 className="font-medium">{activity.name}</h4>
-                                <p className="text-sm text-gray-500">{activity.description}</p>
+                                <h4 className="font-medium text-white">{activity.name}</h4>
+                                <p className="text-sm text-indigo-300">{activity.description}</p>
                               </div>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => toggleFavorite(activity)}
-                                className="rounded-full text-red-500"
+                                className="rounded-full hover:bg-indigo-800/50 text-pink-500"
                               >
-                                <X className="h-4 w-4" />
+                                <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
+                                  <X className="h-4 w-4" />
+                                </motion.div>
                               </Button>
-                            </div>
+                            </motion.div>
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-indigo-300">
                           <p>No favorite activities yet</p>
                         </div>
                       )}
@@ -661,34 +667,38 @@ export default function ActivityGenerator() {
 
             {activities.filter((a) => a.custom).length > 0 && (
               <div className="mt-8">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Your Custom Activities</h3>
-                <Card>
+                <h3 className="text-sm font-medium text-indigo-300 mb-2">Your Custom Activities</h3>
+                <Card className="border border-indigo-500/30 shadow-lg bg-gradient-to-br from-gray-900/90 to-indigo-900/90 backdrop-filter backdrop-blur-lg">
                   <CardContent className="p-4">
                     <ScrollArea className="h-[150px]">
                       <div className="space-y-2">
                         {activities
                           .filter((a) => a.custom)
                           .map((activity) => (
-                            <div
+                            <motion.div
                               key={activity.id}
-                              className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg"
+                              className="flex items-center justify-between p-2 hover:bg-indigo-900/40 rounded-lg border border-indigo-500/20"
+                              whileHover={{ scale: 1.02, borderColor: "rgba(99, 102, 241, 0.4)" }}
+                              transition={{ duration: 0.2 }}
                             >
                               <div className="flex items-center gap-2">
-                                <div className="p-1 bg-gray-100 rounded-full">{activity.emoji}</div>
+                                <div className="p-1 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg">{activity.emoji}</div>
                                 <div>
-                                  <h4 className="text-sm font-medium">{activity.name}</h4>
-                                  <p className="text-xs text-gray-500 capitalize">{activity.category}</p>
+                                  <h4 className="text-sm font-medium text-white">{activity.name}</h4>
+                                  <p className="text-xs text-indigo-300 capitalize">{activity.category}</p>
                                 </div>
                               </div>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => deleteCustomActivity(activity.id)}
-                                className="h-8 w-8 rounded-full text-gray-400 hover:text-red-500"
+                                className="h-8 w-8 rounded-full text-gray-400 hover:text-red-500 hover:bg-indigo-800/50"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
+                                  <Trash2 className="h-4 w-4" />
+                                </motion.div>
                               </Button>
-                            </div>
+                            </motion.div>
                           ))}
                       </div>
                     </ScrollArea>
