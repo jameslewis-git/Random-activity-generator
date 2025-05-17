@@ -199,7 +199,7 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
               initial="initial"
               animate="animate"
               className={cn(
-                "absolute inset-0 rounded-3xl z-0",
+                "absolute inset-0 rounded-[24px] z-0",
                 isLuckyActive 
                   ? "bg-gradient-to-r from-yellow-500/30 to-amber-500/30" 
                   : "bg-gradient-to-r from-purple-500/20 to-pink-500/20"
@@ -212,7 +212,7 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
               animate="animate"
               transition={{ delay: 0.4 }}
               className={cn(
-                "absolute inset-0 rounded-3xl z-0",
+                "absolute inset-0 rounded-[24px] z-0",
                 isLuckyActive 
                   ? "bg-gradient-to-r from-amber-500/30 to-orange-500/30" 
                   : "bg-gradient-to-r from-indigo-500/20 to-blue-500/20"
@@ -245,17 +245,17 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                       transform: `scale(${card.scale})`,
                     }}
                   >
-                    <Card className={cn(
-                      "w-full border-2 shadow-xl backdrop-filter backdrop-blur-sm rounded-xl",
+                    <div className={cn(
+                      "w-full border overflow-hidden backdrop-filter backdrop-blur-sm",
                       isLuckyActive 
-                        ? "border-amber-500/50 bg-gradient-to-br from-amber-900/80 to-yellow-800/80" 
-                        : "border-indigo-500/50 bg-gradient-to-br from-gray-700/95 to-indigo-700/95"
+                        ? "border-amber-500/50 bg-gradient-to-br from-amber-900/80 to-yellow-800/80 smooth-card-amber" 
+                        : "border-indigo-500/50 bg-gradient-to-br from-gray-700/95 to-indigo-700/95 smooth-card",
                     )}>
-                      <CardContent className="p-6 opacity-80">
+                      <div className="p-6 opacity-80">
                         <div className="w-full h-4 bg-indigo-500/30 rounded animate-pulse" />
                         <div className="w-2/3 h-4 bg-indigo-500/30 rounded animate-pulse mt-2" />
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </motion.div>
                 ))}
 
@@ -275,13 +275,13 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                     transformStyle: "preserve-3d",
                   }}
                 >
-                  <Card className={cn(
-                    "w-full overflow-hidden border shadow-xl backdrop-filter backdrop-blur-lg rounded-xl",
+                  <div className={cn(
+                    "w-full overflow-hidden border backdrop-filter backdrop-blur-lg",
                     isLuckyActive 
-                      ? "border-amber-500/40 bg-gradient-to-br from-amber-900/90 to-yellow-800/90" 
-                      : "border-indigo-500/30 bg-gradient-to-br from-gray-900/90 to-indigo-900/90"
+                      ? "border-amber-500/40 bg-gradient-to-br from-amber-900/90 to-yellow-800/90 smooth-card-amber" 
+                      : "border-indigo-500/30 bg-gradient-to-br from-gray-900/90 to-indigo-900/90 smooth-card"
                   )}>
-                    <CardContent className="p-6">
+                    <div className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
                           <motion.div 
@@ -434,8 +434,8 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                       >
                         {activity.description}
                       </motion.p>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -447,8 +447,8 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
               exit={{ opacity: 0 }}
               className="absolute inset-0"
             >
-              <Card className="w-full h-full overflow-hidden border border-dashed border-indigo-500/30 bg-gray-900/50 backdrop-filter backdrop-blur-lg rounded-xl">
-                <CardContent className="p-6 flex flex-col items-center justify-center h-full text-center">
+              <div className="w-full h-full overflow-hidden border border-dashed border-indigo-500/30 bg-gray-900/50 backdrop-filter backdrop-blur-lg smooth-card">
+                <div className="p-6 flex flex-col items-center justify-center h-full text-center">
                   <motion.div
                     animate={{ 
                       rotate: 360,
@@ -475,8 +475,8 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                   >
                     {isGenerating ? "Finding an activity for you..." : "Click generate to discover your next activity"}
                   </motion.p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

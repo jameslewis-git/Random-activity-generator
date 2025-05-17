@@ -79,6 +79,74 @@ body {
   .perspective-1000 {
     perspective: 1000px;
   }
+  
+  .smooth-card {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                0 5px 10px -5px rgba(0, 0, 0, 0.04),
+                0 0 0 1px rgba(99, 102, 241, 0.1);
+    border-radius: 20px;
+  }
+  
+  .smooth-card-amber {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                0 5px 10px -5px rgba(0, 0, 0, 0.04),
+                0 0 0 1px rgba(245, 158, 11, 0.1);
+    border-radius: 20px;
+  }
+  
+  .gradient-divider {
+    position: relative;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      rgba(168, 85, 247, 0.0) 0%, 
+      rgba(236, 72, 153, 0.7) 50%, 
+      rgba(168, 85, 247, 0.0) 100%);
+    border-radius: 4px;
+    overflow: visible;
+  }
+  
+  .gradient-divider::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 15%;
+    right: 15%;
+    height: 6px;
+    background: linear-gradient(90deg, 
+      rgba(168, 85, 247, 0.0) 0%, 
+      rgba(236, 72, 153, 0.3) 50%, 
+      rgba(168, 85, 247, 0.0) 100%);
+    filter: blur(4px);
+    border-radius: 4px;
+  }
+  
+  .glow-dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(236, 72, 153, 0.8);
+    box-shadow: 0 0 8px 2px rgba(236, 72, 153, 0.6);
+    opacity: 0;
+    animation: glow-slide 3s infinite ease-in-out;
+  }
+  
+  @keyframes glow-slide {
+    0% {
+      left: -5%;
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      left: 105%;
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {

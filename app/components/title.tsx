@@ -15,18 +15,27 @@ export function Title() {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         Activity Generator
-        <motion.div 
-          className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-400 via-pink-500 to-red-500"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-        />
       </motion.h1>
-      <motion.p
-        className="text-gray-400 mt-4 text-lg"
+      
+      {/* Animated gradient divider */}
+      <motion.div 
+        className="w-full max-w-[400px] mt-6 mb-5 relative"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <div className="gradient-divider">
+          <div className="glow-dot" style={{ animationDelay: "0s" }}></div>
+          <div className="glow-dot" style={{ animationDelay: "1s" }}></div>
+          <div className="glow-dot" style={{ animationDelay: "2s" }}></div>
+        </div>
+      </motion.div>
+      
+      <motion.p
+        className="text-gray-400 text-lg mt-1"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
       >
         Discover your next adventure
       </motion.p>
