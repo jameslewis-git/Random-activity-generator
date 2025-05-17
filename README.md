@@ -10,6 +10,10 @@ This project is developed for the Code Circuit Hackathon. It is an interactive a
 - **Dark Theme**: Updated favorites section to match the dark theme with proper localStorage handling.
 - **Visual Appeal**: Redesigned header section with a gradient divider and glow effect.
 
+## Live Demo
+
+Check out the live demo of the application here: [activitygeneratorcodecircuit.netlify.app](https://activitygeneratorcodecircuit.netlify.app) 
+
 ## Installation
 
 1. Clone the repository:
@@ -41,4 +45,4 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.
