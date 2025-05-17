@@ -55,6 +55,27 @@ body {
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
   }
   
+  .button-glow-amber {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    animation: pulse-amber 2s infinite;
+  }
+  
+  .button-glow-amber:hover {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  }
+  
+  @keyframes pulse-amber {
+    0% {
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), 0 0 30px rgba(245, 158, 11, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+  }
+  
   .perspective-1000 {
     perspective: 1000px;
   }

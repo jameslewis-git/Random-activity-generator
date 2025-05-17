@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Activity } from "../types"
 import { Button } from "@/components/ui/button"
-import { Share2, Star } from "lucide-react"
+import { Share2, Star, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
 import { CornerPoppers } from "./corner-poppers"
 
@@ -15,9 +15,10 @@ interface StackedCardsProps {
   favorites: Activity[]
   onFavorite: (activity: Activity) => void
   onShare: (activity: Activity) => void
+  isLuckyActive?: boolean
 }
 
-export function StackedCards({ activity, isGenerating, favorites, onFavorite, onShare }: StackedCardsProps) {
+export function StackedCards({ activity, isGenerating, favorites, onFavorite, onShare, isLuckyActive = false }: StackedCardsProps) {
   const [showPoppers, setShowPoppers] = useState(false)
   const [shuffleCards, setShuffleCards] = useState(false)
 
@@ -29,10 +30,10 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
       const timer = setTimeout(() => {
         setShowPoppers(false)
         setShuffleCards(false)
-      }, 3000)
+      }, isLuckyActive ? 4000 : 3000)
       return () => clearTimeout(timer)
     }
-  }, [activity?.id])
+  }, [activity?.id, isLuckyActive])
 
   const cardVariants = {
     initial: (custom: number) => ({
@@ -49,12 +50,12 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
     }),
     animate: (custom: number) => ({
       opacity: 1,
-      y: custom * -8,
-      x: Math.sin(custom) * 5,
-      scale: 1 - custom * 0.03,
+      y: custom * (isLuckyActive ? -12 : -8),
+      x: Math.sin(custom) * (isLuckyActive ? 8 : 5),
+      scale: 1 - custom * (isLuckyActive ? 0.025 : 0.03),
       rotateY: 0,
-      rotateX: custom * -1.5,
-      rotateZ: Math.sin(custom) * 2,
+      rotateX: custom * (isLuckyActive ? -2 : -1.5),
+      rotateZ: Math.sin(custom) * (isLuckyActive ? 3 : 2),
       transformPerspective: 2000,
       transformStyle: "preserve-3d",
       transformOrigin: "center center",
@@ -62,8 +63,8 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
         opacity: { duration: 0.5, delay: custom * 0.2 },
         y: { 
           type: "spring",
-          stiffness: 30,
-          damping: 12,
+          stiffness: isLuckyActive ? 25 : 30,
+          damping: isLuckyActive ? 8 : 12,
           mass: 1,
           delay: custom * 0.3,
           repeat: Infinity,
@@ -72,8 +73,8 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
         },
         x: {
           type: "spring",
-          stiffness: 40,
-          damping: 12,
+          stiffness: isLuckyActive ? 35 : 40,
+          damping: isLuckyActive ? 8 : 12,
           mass: 1,
           delay: custom * 0.3,
           repeat: Infinity,
@@ -82,24 +83,24 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
         },
         rotateY: { 
           type: "spring",
-          stiffness: 30,
-          damping: 12,
+          stiffness: isLuckyActive ? 25 : 30,
+          damping: isLuckyActive ? 8 : 12,
           mass: 1,
           delay: custom * 0.3,
-          duration: 1.5
+          duration: isLuckyActive ? 2 : 1.5
         },
         rotateX: {
           type: "spring",
-          stiffness: 30,
-          damping: 12,
+          stiffness: isLuckyActive ? 25 : 30,
+          damping: isLuckyActive ? 8 : 12,
           mass: 1,
           delay: custom * 0.3,
-          duration: 1.5
+          duration: isLuckyActive ? 2 : 1.5
         },
         rotateZ: {
           type: "spring",
-          stiffness: 30,
-          damping: 12,
+          stiffness: isLuckyActive ? 25 : 30,
+          damping: isLuckyActive ? 8 : 12,
           mass: 1,
           delay: custom * 0.3,
           repeat: Infinity,
@@ -108,11 +109,11 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
         },
         scale: {
           type: "spring",
-          stiffness: 30,
-          damping: 15,
+          stiffness: isLuckyActive ? 25 : 30,
+          damping: isLuckyActive ? 10 : 15,
           mass: 1,
           delay: custom * 0.3,
-          duration: 1.5
+          duration: isLuckyActive ? 2 : 1.5
         }
       },
     }),
@@ -197,7 +198,12 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
               variants={celebrationVariants}
               initial="initial"
               animate="animate"
-              className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl z-0"
+              className={cn(
+                "absolute inset-0 rounded-3xl z-0",
+                isLuckyActive 
+                  ? "bg-gradient-to-r from-yellow-500/30 to-amber-500/30" 
+                  : "bg-gradient-to-r from-purple-500/20 to-pink-500/20"
+              )}
             />
             <motion.div
               key={`celebration-2-${activity.id}`}
@@ -205,7 +211,12 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
               initial="initial"
               animate="animate"
               transition={{ delay: 0.4 }}
-              className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-blue-500/20 rounded-3xl z-0"
+              className={cn(
+                "absolute inset-0 rounded-3xl z-0",
+                isLuckyActive 
+                  ? "bg-gradient-to-r from-amber-500/30 to-orange-500/30" 
+                  : "bg-gradient-to-r from-indigo-500/20 to-blue-500/20"
+              )}
             />
           </>
         )}
@@ -234,7 +245,12 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                       transform: `scale(${card.scale})`,
                     }}
                   >
-                    <Card className="w-full border-2 border-indigo-500/50 shadow-xl bg-gradient-to-br from-gray-700/95 to-indigo-700/95 backdrop-filter backdrop-blur-sm rounded-xl">
+                    <Card className={cn(
+                      "w-full border-2 shadow-xl backdrop-filter backdrop-blur-sm rounded-xl",
+                      isLuckyActive 
+                        ? "border-amber-500/50 bg-gradient-to-br from-amber-900/80 to-yellow-800/80" 
+                        : "border-indigo-500/50 bg-gradient-to-br from-gray-700/95 to-indigo-700/95"
+                    )}>
                       <CardContent className="p-6 opacity-80">
                         <div className="w-full h-4 bg-indigo-500/30 rounded animate-pulse" />
                         <div className="w-2/3 h-4 bg-indigo-500/30 rounded animate-pulse mt-2" />
@@ -259,12 +275,22 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                     transformStyle: "preserve-3d",
                   }}
                 >
-                  <Card className="w-full overflow-hidden border border-indigo-500/30 shadow-xl bg-gradient-to-br from-gray-900/90 to-indigo-900/90 backdrop-filter backdrop-blur-lg rounded-xl">
+                  <Card className={cn(
+                    "w-full overflow-hidden border shadow-xl backdrop-filter backdrop-blur-lg rounded-xl",
+                    isLuckyActive 
+                      ? "border-amber-500/40 bg-gradient-to-br from-amber-900/90 to-yellow-800/90" 
+                      : "border-indigo-500/30 bg-gradient-to-br from-gray-900/90 to-indigo-900/90"
+                  )}>
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
                           <motion.div 
-                            className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-lg will-change-transform"
+                            className={cn(
+                              "p-3 rounded-xl shadow-lg will-change-transform",
+                              isLuckyActive 
+                                ? "bg-gradient-to-br from-amber-600 to-yellow-600" 
+                                : "bg-gradient-to-br from-indigo-600 to-purple-600"
+                            )}
                             initial={{ rotate: -180, scale: 0 }}
                             animate={{ 
                               rotate: 0, 
@@ -298,9 +324,26 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                               transition={{ delay: 0.8, duration: 0.8 }}
                             >
                               {activity.name}
+                              {isLuckyActive && (
+                                <motion.span 
+                                  className="inline-flex ml-2 text-yellow-400"
+                                  initial={{ rotate: 0 }}
+                                  animate={{ rotate: [0, 15, -15, 0] }}
+                                  transition={{ 
+                                    repeat: Infinity, 
+                                    duration: 2, 
+                                    repeatType: "loop"
+                                  }}
+                                >
+                                  <Sparkles className="h-5 w-5" />
+                                </motion.span>
+                              )}
                             </motion.h3>
                             <motion.p 
-                              className="text-sm text-indigo-300 capitalize"
+                              className={cn(
+                                "text-sm capitalize",
+                                isLuckyActive ? "text-amber-300" : "text-indigo-300"
+                              )}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: 1, duration: 0.8 }}
@@ -321,13 +364,20 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                           >
                             <motion.div 
                               initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
+                              animate={{ 
+                                scale: 1,
+                                rotate: favorites.some((fav) => fav.id === activity.id) ? [0, 15, 0, -15, 0] : 0
+                              }}
                               transition={{ 
                                 delay: 1.2, 
                                 type: "spring",
                                 stiffness: 100,
                                 damping: 15,
-                                duration: 0.8
+                                duration: 0.8,
+                                rotate: {
+                                  repeat: favorites.some((fav) => fav.id === activity.id) ? 1 : 0,
+                                  duration: 0.5
+                                }
                               }}
                               whileHover={{ 
                                 scale: 1.2, 
@@ -338,7 +388,12 @@ export function StackedCards({ activity, isGenerating, favorites, onFavorite, on
                               }} 
                               whileTap={{ scale: 0.9 }}
                             >
-                              <Star className="h-5 w-5" />
+                              <Star 
+                                className={cn(
+                                  "h-5 w-5",
+                                  favorites.some((fav) => fav.id === activity.id) ? "fill-pink-500 text-pink-500" : "fill-transparent"
+                                )} 
+                              />
                             </motion.div>
                           </Button>
                           <Button

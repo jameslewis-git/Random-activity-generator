@@ -201,6 +201,7 @@ export default function ActivityGenerator() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isLuckyActive, setIsLuckyActive] = useState(false)
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -209,32 +210,47 @@ export default function ActivityGenerator() {
     const savedHistory = localStorage.getItem("history")
 
     if (savedActivities) {
-      const parsedActivities = JSON.parse(savedActivities) as StoredActivity[];
-      const reconstitutedActivities = parsedActivities.map((activity) => ({
-        ...activity,
-        emoji: getCategoryIcon(activity.category)
-      }));
-      setActivities([...initialActivities, ...reconstitutedActivities])
+      try {
+        const parsedActivities = JSON.parse(savedActivities) as StoredActivity[];
+        const reconstitutedActivities = parsedActivities.map((activity) => ({
+          ...activity,
+          emoji: getCategoryIcon(activity.category)
+        }));
+        setActivities([...initialActivities, ...reconstitutedActivities])
+      } catch (e) {
+        console.error("Error parsing saved activities:", e);
+        setActivities(initialActivities);
+      }
     } else {
       setActivities(initialActivities)
     }
 
     if (savedFavorites) {
-      const parsedFavorites = JSON.parse(savedFavorites) as StoredActivity[];
-      const reconstitutedFavorites = parsedFavorites.map((activity) => ({
-        ...activity,
-        emoji: getCategoryIcon(activity.category)
-      }));
-      setFavorites(reconstitutedFavorites)
+      try {
+        const parsedFavorites = JSON.parse(savedFavorites) as StoredActivity[];
+        const reconstitutedFavorites = parsedFavorites.map((activity) => ({
+          ...activity,
+          emoji: getCategoryIcon(activity.category)
+        }));
+        setFavorites(reconstitutedFavorites)
+      } catch (e) {
+        console.error("Error parsing saved favorites:", e);
+        setFavorites([]);
+      }
     }
 
     if (savedHistory) {
-      const parsedHistory = JSON.parse(savedHistory) as StoredActivity[];
-      const reconstitutedHistory = parsedHistory.map((activity) => ({
-        ...activity,
-        emoji: getCategoryIcon(activity.category)
-      }));
-      setHistory(reconstitutedHistory)
+      try {
+        const parsedHistory = JSON.parse(savedHistory) as StoredActivity[];
+        const reconstitutedHistory = parsedHistory.map((activity) => ({
+          ...activity,
+          emoji: getCategoryIcon(activity.category)
+        }));
+        setHistory(reconstitutedHistory)
+      } catch (e) {
+        console.error("Error parsing saved history:", e);
+        setHistory([]);
+      }
     }
   }, [])
 
@@ -243,24 +259,20 @@ export default function ActivityGenerator() {
     const customActivities = activities
       .filter((activity) => activity.custom)
       .map(({ emoji, ...rest }) => rest);
-    if (customActivities.length > 0) {
-      localStorage.setItem("activities", JSON.stringify(customActivities))
-    }
+    
+    localStorage.setItem("activities", JSON.stringify(customActivities))
 
     const storedFavorites = favorites.map(({ emoji, ...rest }) => rest);
-    if (storedFavorites.length > 0) {
-      localStorage.setItem("favorites", JSON.stringify(storedFavorites))
-    }
+    localStorage.setItem("favorites", JSON.stringify(storedFavorites))
 
     const storedHistory = history.map(({ emoji, ...rest }) => rest);
-    if (storedHistory.length > 0) {
-      localStorage.setItem("history", JSON.stringify(storedHistory))
-    }
+    localStorage.setItem("history", JSON.stringify(storedHistory))
   }, [activities, favorites, history])
 
   // Generate a random activity
   const generateActivity = () => {
     setIsGenerating(true)
+    setIsLuckyActive(false)
 
     // Filter activities by selected category
     const filteredActivities =
@@ -303,10 +315,52 @@ export default function ActivityGenerator() {
     }, 100)
   }
 
-  // Generate a random activity from any category
+  // Generate a random activity from any category with special effects
   const feelingLucky = () => {
     setSelectedCategory("all")
-    generateActivity()
+    setIsGenerating(true)
+    setIsLuckyActive(true)
+
+    if (activities.length === 0) {
+      toast({
+        title: "No activities found",
+        description: "Try adding your own activities.",
+        variant: "destructive",
+      })
+      setIsGenerating(false)
+      setIsLuckyActive(false)
+      return
+    }
+
+    // More dramatic pause with faster roulette for Lucky
+    let counter = 0
+    const maxSpins = 15; // More spins for Lucky
+    const interval = setInterval(() => {
+      // For lucky, pick completely random activities from any category
+      const randomIndex = Math.floor(Math.random() * activities.length)
+      setCurrentActivity(activities[randomIndex])
+      counter++
+
+      if (counter >= maxSpins) {
+        clearInterval(interval)
+        
+        // For Lucky, we pick something truly random
+        const finalActivity = activities[Math.floor(Math.random() * activities.length)]
+        setCurrentActivity(finalActivity)
+
+        // Add to history
+        setHistory((prev) => {
+          const newHistory = [finalActivity, ...prev]
+          return newHistory.slice(0, 10) // Keep only the last 10 activities
+        })
+
+        // Show extra confetti for lucky
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 4000)
+
+        setIsGenerating(false)
+      }
+    }, 80) // Faster spins for Lucky (80ms vs 100ms)
   }
 
   // Add a custom activity
@@ -347,7 +401,9 @@ export default function ActivityGenerator() {
       setFavorites((prev) => prev.filter((fav) => fav.id !== activity.id))
       toast({ description: "Removed from favorites" })
     } else {
-      setFavorites((prev) => [...prev, activity])
+      // Make sure we're adding a complete copy of the activity
+      const favoriteToAdd = {...activity};
+      setFavorites((prev) => [...prev, favoriteToAdd])
       toast({ description: "Added to favorites" })
     }
   }
@@ -474,10 +530,30 @@ export default function ActivityGenerator() {
                 onClick={feelingLucky}
                 disabled={isGenerating}
                 variant="outline"
-                className="bg-transparent hover:bg-indigo-900/30 border border-indigo-500/50 text-indigo-300 font-medium py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg backdrop-filter backdrop-blur-sm"
+                className={cn(
+                  "bg-transparent hover:bg-indigo-900/30 border font-medium py-2 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg backdrop-filter backdrop-blur-sm",
+                  isLuckyActive 
+                    ? "border-amber-500/50 text-amber-300 button-glow-amber" 
+                    : "border-indigo-500/50 text-indigo-300"
+                )}
               >
-                <Sparkles className="h-4 w-4" />
-                <span className="sr-only md:not-sr-only md:ml-2">Lucky</span>
+                <motion.div
+                  animate={isLuckyActive ? { 
+                    rotate: [0, 10, -10, 0],
+                    scale: [1, 1.1, 1]
+                  } : {}}
+                  transition={{ 
+                    repeat: isLuckyActive ? Infinity : 0, 
+                    duration: 2 
+                  }}
+                  className="flex items-center"
+                >
+                  <Sparkles className={cn(
+                    "h-4 w-4",
+                    isLuckyActive && "text-yellow-400"
+                  )} />
+                  <span className="sr-only md:not-sr-only md:ml-2">Lucky</span>
+                </motion.div>
               </Button>
             </motion.div>
 
@@ -489,6 +565,7 @@ export default function ActivityGenerator() {
                   favorites={favorites}
                   onFavorite={toggleFavorite}
                   onShare={shareActivity}
+                  isLuckyActive={isLuckyActive}
                 />
               </AnimatePresence>
             </div>
@@ -610,49 +687,51 @@ export default function ActivityGenerator() {
                     Add Activity
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-gradient-to-br from-gray-900 to-indigo-900 border border-indigo-500/30 backdrop-filter backdrop-blur-lg text-white">
                   <DialogHeader>
-                    <DialogTitle>Add Custom Activity</DialogTitle>
+                    <DialogTitle className="text-indigo-300">Add Custom Activity</DialogTitle>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="name">Activity Name</Label>
+                      <Label htmlFor="name" className="text-indigo-200">Activity Name</Label>
                       <Input
                         id="name"
                         value={newActivity.name}
                         onChange={(e) => setNewActivity({ ...newActivity, name: e.target.value })}
                         placeholder="Go for a run"
+                        className="bg-gray-800/50 border-indigo-500/30 text-white placeholder:text-gray-400"
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label htmlFor="description">Description</Label>
+                      <Label htmlFor="description" className="text-indigo-200">Description</Label>
                       <Textarea
                         id="description"
                         value={newActivity.description}
                         onChange={(e) => setNewActivity({ ...newActivity, description: e.target.value })}
                         placeholder="Run for 30 minutes in your neighborhood"
+                        className="bg-gray-800/50 border-indigo-500/30 text-white placeholder:text-gray-400"
                       />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Category</Label>
+                      <Label className="text-indigo-200">Category</Label>
                       <Tabs
                         value={newActivity.category}
                         onValueChange={(value) => setNewActivity({ ...newActivity, category: value })}
                       >
-                        <TabsList className="grid grid-cols-4">
-                          <TabsTrigger value="outdoor" className="data-[state=active]:bg-green-100">
+                        <TabsList className="grid grid-cols-4 bg-gray-800/70 border border-indigo-500/20">
+                          <TabsTrigger value="outdoor" className="data-[state=active]:bg-green-900 data-[state=active]:text-white text-gray-300">
                             <Bike className="h-4 w-4 mr-1" />
                             Outdoor
                           </TabsTrigger>
-                          <TabsTrigger value="learn" className="data-[state=active]:bg-blue-100">
+                          <TabsTrigger value="learn" className="data-[state=active]:bg-blue-900 data-[state=active]:text-white text-gray-300">
                             <Book className="h-4 w-4 mr-1" />
                             Learn
                           </TabsTrigger>
-                          <TabsTrigger value="relax" className="data-[state=active]:bg-amber-100">
+                          <TabsTrigger value="relax" className="data-[state=active]:bg-amber-900 data-[state=active]:text-white text-gray-300">
                             <Coffee className="h-4 w-4 mr-1" />
                             Relax
                           </TabsTrigger>
-                          <TabsTrigger value="creative" className="data-[state=active]:bg-purple-100">
+                          <TabsTrigger value="creative" className="data-[state=active]:bg-purple-900 data-[state=active]:text-white text-gray-300">
                             <Palette className="h-4 w-4 mr-1" />
                             Create
                           </TabsTrigger>
@@ -660,7 +739,9 @@ export default function ActivityGenerator() {
                       </Tabs>
                     </div>
                   </div>
-                  <Button onClick={addCustomActivity}>Add Activity</Button>
+                  <Button onClick={addCustomActivity} className="bg-gradient-to-r from-pink-600 to-indigo-600 hover:from-pink-700 hover:to-indigo-700 text-white">
+                    Add Activity
+                  </Button>
                 </DialogContent>
               </Dialog>
             </div>
