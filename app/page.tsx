@@ -38,8 +38,13 @@ import {
 import Confetti from "./components/confetti"
 import { BackgroundEffects } from "./components/background-effects"
 import { Title } from "./components/title"
+import { StackedCards } from "./components/stacked-cards"
 
 // Activity type definition
+type StoredActivity = Omit<Activity, 'emoji'> & {
+  category: string;
+}
+
 type Activity = {
   id: string
   name: string
@@ -204,33 +209,52 @@ export default function ActivityGenerator() {
     const savedHistory = localStorage.getItem("history")
 
     if (savedActivities) {
-      setActivities([...initialActivities, ...JSON.parse(savedActivities)])
+      const parsedActivities = JSON.parse(savedActivities) as StoredActivity[];
+      const reconstitutedActivities = parsedActivities.map((activity) => ({
+        ...activity,
+        emoji: getCategoryIcon(activity.category)
+      }));
+      setActivities([...initialActivities, ...reconstitutedActivities])
     } else {
       setActivities(initialActivities)
     }
 
     if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites))
+      const parsedFavorites = JSON.parse(savedFavorites) as StoredActivity[];
+      const reconstitutedFavorites = parsedFavorites.map((activity) => ({
+        ...activity,
+        emoji: getCategoryIcon(activity.category)
+      }));
+      setFavorites(reconstitutedFavorites)
     }
 
     if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
+      const parsedHistory = JSON.parse(savedHistory) as StoredActivity[];
+      const reconstitutedHistory = parsedHistory.map((activity) => ({
+        ...activity,
+        emoji: getCategoryIcon(activity.category)
+      }));
+      setHistory(reconstitutedHistory)
     }
   }, [])
 
   // Save data to localStorage when it changes
   useEffect(() => {
-    const customActivities = activities.filter((activity) => activity.custom)
+    const customActivities = activities
+      .filter((activity) => activity.custom)
+      .map(({ emoji, ...rest }) => rest);
     if (customActivities.length > 0) {
       localStorage.setItem("activities", JSON.stringify(customActivities))
     }
 
-    if (favorites.length > 0) {
-      localStorage.setItem("favorites", JSON.stringify(favorites))
+    const storedFavorites = favorites.map(({ emoji, ...rest }) => rest);
+    if (storedFavorites.length > 0) {
+      localStorage.setItem("favorites", JSON.stringify(storedFavorites))
     }
 
-    if (history.length > 0) {
-      localStorage.setItem("history", JSON.stringify(history))
+    const storedHistory = history.map(({ emoji, ...rest }) => rest);
+    if (storedHistory.length > 0) {
+      localStorage.setItem("history", JSON.stringify(storedHistory))
     }
   }, [activities, favorites, history])
 
@@ -423,7 +447,7 @@ export default function ActivityGenerator() {
             </motion.div>
 
             <motion.div
-              className="flex gap-2 mb-6"
+              className="flex gap-2 mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
@@ -457,75 +481,19 @@ export default function ActivityGenerator() {
               </Button>
             </motion.div>
 
-            <AnimatePresence mode="wait">
-              {currentActivity ? (
-                <motion.div
-                  key={currentActivity.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                >
-                  <motion.div animate={controls}>
-                    <Card className="overflow-hidden border border-indigo-500/30 shadow-xl bg-gradient-to-br from-gray-900/90 to-indigo-900/90 backdrop-filter backdrop-blur-lg rounded-xl card-hover-effect">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-lg">{currentActivity.emoji}</div>
-                            <div>
-                              <h3 className="text-xl font-bold text-white">{currentActivity.name}</h3>
-                              <p className="text-sm text-indigo-300 capitalize">{currentActivity.category}</p>
-                            </div>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => toggleFavorite(currentActivity)}
-                              className={cn(
-                                "rounded-full hover:bg-indigo-800/50",
-                                favorites.some((fav) => fav.id === currentActivity.id) ? "text-pink-500" : "text-gray-400",
-                              )}
-                            >
-                              <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
-                                <Star className="h-5 w-5" />
-                              </motion.div>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => shareActivity(currentActivity)}
-                              className="rounded-full hover:bg-indigo-800/50 text-gray-400"
-                            >
-                              <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
-                                <Share2 className="h-5 w-5" />
-                              </motion.div>
-                            </Button>
-                          </div>
-                        </div>
-                        <p className="mt-4 text-gray-300 leading-relaxed">{currentActivity.description}</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </motion.div>
-              ) : (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <Card className="overflow-hidden border border-dashed border-indigo-500/30 bg-gray-900/50 backdrop-filter backdrop-blur-lg rounded-xl card-hover-effect">
-                    <CardContent className="p-6 flex flex-col items-center justify-center min-h-[150px] text-center">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                      >
-                        <Dices className="h-12 w-12 text-indigo-400 mb-3" />
-                      </motion.div>
-                      <p className="text-indigo-300">Click the generate button to discover your next activity</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="mb-8">
+              <AnimatePresence mode="wait">
+                <StackedCards
+                  activity={currentActivity}
+                  isGenerating={isGenerating}
+                  favorites={favorites}
+                  onFavorite={toggleFavorite}
+                  onShare={shareActivity}
+                />
+              </AnimatePresence>
+            </div>
 
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between mt-2">
               <div className="flex gap-2">
                 <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
                   <DialogTrigger asChild>
